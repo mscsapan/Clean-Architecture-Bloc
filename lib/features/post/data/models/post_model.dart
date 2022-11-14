@@ -1,11 +1,12 @@
+import 'package:clean_architecture_bloc/features/post/domain/entities/post.dart';
 import 'package:equatable/equatable.dart';
 
-class PostModel extends Equatable {
-  final int id;
-  final String title;
-  final String body;
-
-  const PostModel({required this.id, required this.title, required this.body});
+class PostModel extends Post {
+  const PostModel({
+    required int id,
+    required String title,
+    required String body,
+  }) : super(id: id, title: title, body: body);
 
   PostModel copyWith({
     int? id,
@@ -32,7 +33,4 @@ class PostModel extends Equatable {
   String toString() {
     return 'PostModel(id: $id, title: $title, body: $body)';
   }
-
-  @override
-  List<Object?> get props => [id, title, bool];
 }
