@@ -1,12 +1,15 @@
-import 'package:clean_architecture_bloc/core/error/exceptions.dart';
 import 'package:dartz/dartz.dart';
 
+import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../network/post_network.dart';
 import '../../domain/entities/post.dart';
 import '../../domain/repositories/post_repository.dart';
 import '../data_sources/local_data_source.dart';
 import '../data_sources/remote_data_source.dart';
+import '../models/post_model.dart';
+
+typedef MyCustomFunction = Future<Unit> Function();
 
 class PostRepositoryImpl implements PostRepository {
   PostRemoteDataSource postRemoteDataSource;
@@ -19,15 +22,19 @@ class PostRepositoryImpl implements PostRepository {
       required this.postNetwork});
 
   @override
-  Future<Either<Failure, Unit>> addNewPost(Post post) {
-    // TODO: implement addNewPost
-    throw UnimplementedError();
+  Future<Either<Failure, Unit>> addNewPost(Post post) async {
+    PostModel addNewPost =
+        PostModel(id: post.id, title: post.title, body: post.body);
+    return _getCustomMessages(() {
+      return postRemoteDataSource.addNewAllRemotePost(addNewPost);
+    });
   }
 
   @override
-  Future<Either<Failure, Unit>> deletePost(int postId) {
-    // TODO: implement deletePost
-    throw UnimplementedError();
+  Future<Either<Failure, Unit>> deletePost(int postId) async {
+    return _getCustomMessages(() {
+      return postRemoteDataSource.deleteAllRemotePost(postId);
+    });
   }
 
   @override
@@ -50,10 +57,29 @@ class PostRepositoryImpl implements PostRepository {
     }
   }
 
-//8 no. video 13.0 sec
   @override
-  Future<Either<Failure, Unit>> updatePost(Post post) {
-    // TODO: implement updatePost
-    throw UnimplementedError();
+  Future<Either<Failure, Unit>> updatePost(Post post) async {
+    final updatePost =
+        PostModel(id: post.id, title: post.title, body: post.body);
+    if (await postNetwork.getConnected) {
+      await postRemoteDataSource.updateAllRemotePost(updatePost);
+      return const Right(unit);
+    } else {
+      return Left(OfflineFailure());
+    }
+  }
+
+  Future<Either<Failure, Unit>> _getCustomMessages(
+      MyCustomFunction postFunction) async {
+    if (await postNetwork.getConnected) {
+      try {
+        await postFunction();
+        return const Right(unit);
+      } on ServerException {
+        return Left(OfflineFailure());
+      }
+    } else {
+      return Left(OfflineFailure());
+    }
   }
 }
