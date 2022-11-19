@@ -3,7 +3,6 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../network/post_network.dart';
-import '../../domain/entities/post.dart';
 import '../../domain/repositories/post_repository.dart';
 import '../data_sources/local_data_source.dart';
 import '../data_sources/remote_data_source.dart';
@@ -22,7 +21,7 @@ class PostRepositoryImpl implements PostRepository {
       required this.postNetwork});
 
   @override
-  Future<Either<Failure, Unit>> addNewPost(Post post) async {
+  Future<Either<Failure, Unit>> addNewPost(PostModel post) async {
     PostModel addNewPost =
         PostModel(id: post.id, title: post.title, body: post.body);
     return _getCustomMessages(() {
@@ -38,7 +37,7 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, List<Post>>> getAllPost() async {
+  Future<Either<Failure, List<PostModel>>> getAllPost() async {
     if (await postNetwork.getConnected) {
       try {
         final postData = await postRemoteDataSource.getAllRemotePost();
@@ -58,7 +57,7 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> updatePost(Post post) async {
+  Future<Either<Failure, Unit>> updatePost(PostModel post) async {
     final updatePost =
         PostModel(id: post.id, title: post.title, body: post.body);
     if (await postNetwork.getConnected) {

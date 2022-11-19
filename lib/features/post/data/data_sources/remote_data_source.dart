@@ -3,7 +3,6 @@ import 'dart:convert';
 import '/core/error/exceptions.dart';
 import 'package:dartz/dartz.dart';
 
-import '../../domain/entities/post.dart';
 import '../models/post_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,9 +14,9 @@ abstract class PostRemoteDataSource {
 
   Future<Unit> deleteAllRemotePost(int postId);
 
-  Future<Unit> updateAllRemotePost(Post post);
+  Future<Unit> updateAllRemotePost(PostModel post);
 
-  Future<Unit> addNewAllRemotePost(Post post);
+  Future<Unit> addNewAllRemotePost(PostModel post);
 }
 
 class PostRemoteDataSourceImpl implements PostRemoteDataSource {
@@ -26,9 +25,8 @@ class PostRemoteDataSourceImpl implements PostRemoteDataSource {
   PostRemoteDataSourceImpl({required this.client});
 
   @override
-  Future<Unit> addNewAllRemotePost(Post post) async {
+  Future<Unit> addNewAllRemotePost(PostModel post) async {
     final body = {
-      'id': post.id,
       'title': post.title,
       'body': post.body,
     };
@@ -67,10 +65,9 @@ class PostRemoteDataSourceImpl implements PostRemoteDataSource {
   }
 
   @override
-  Future<Unit> updateAllRemotePost(Post post) async {
+  Future<Unit> updateAllRemotePost(PostModel post) async {
     final id = post.id.toString();
     final body = {
-      'id': post.id,
       'title': post.title,
       'body': post.body,
     };
@@ -83,3 +80,4 @@ class PostRemoteDataSourceImpl implements PostRemoteDataSource {
     }
   }
 }
+//9 th video completed
